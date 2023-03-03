@@ -8,13 +8,10 @@
 import Foundation
 import CoreLocation
 
-class LocationHandler: NSObject, CLLocationManagerDelegate, ObservableObject {
+class LocationHandler: NSObject, CLLocationManagerDelegate {
     let manager = CLLocationManager()
     let geocoder = CLGeocoder()
-    @Published var city: String = ""
-    @Published var subCity: String = ""
-    @Published var street: String = ""
-    @Published var lastKnownLocation: String = ""
+    weak var stateController: StateController?
     
     override init() {
         super.init()
@@ -34,12 +31,10 @@ class LocationHandler: NSObject, CLLocationManagerDelegate, ObservableObject {
         if let firstLocation = locations.first {
             geocoder.reverseGeocodeLocation(firstLocation, completionHandler: { (placemarks, error) in
                 if error != nil {
-                    self.lastKnownLocation = "Could not perofrm lookup of location from coordinate information"
+                    self.stateController?.lastKnownLocation = "Could not perofrm lookup of location from coordinate information"
                 } else {
                     if let firstPlacemark = placemarks?[0] {
-                        self.city = firstPlacemark.locality ?? "Couldn't find city"
-                        self.subCity = firstPlacemark.subLocality ?? "Couldn't find sub city"
-                        self.street = firstPlacemark.thoroughfare ?? "Couldn't find street"
+                        self.stateController?.lastKnownLocation = firstPlacemark.locality ?? ""
                     }
                 }
             })
@@ -47,6 +42,6 @@ class LocationHandler: NSObject, CLLocationManagerDelegate, ObservableObject {
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        lastKnownLocation = "Error finding location"
+        self.stateController?.lastKnownLocation = "Error finding location"
     }
 }
