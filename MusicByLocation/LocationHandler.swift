@@ -24,7 +24,6 @@ class LocationHandler: NSObject, CLLocationManagerDelegate {
     
     func requestLocation() {
         manager.requestLocation()
-        
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -34,7 +33,7 @@ class LocationHandler: NSObject, CLLocationManagerDelegate {
                     self.stateController?.lastKnownLocation = "Could not perofrm lookup of location from coordinate information"
                 } else {
                     if let firstPlacemark = placemarks?[0] {
-                        self.stateController?.lastKnownLocation = firstPlacemark.locality ?? ""
+                        self.stateController?.lastKnownLocation = firstPlacemark.administrativeArea ?? ""
                     }
                 }
             })
