@@ -13,8 +13,8 @@ struct ContentView: View {
     var body: some View {
         VStack {
             List {
-                ForEach(state.artistDict, id: \.self) { key, value in
-                    
+                ForEach(state.artistNames) { name in
+                    Text(name)
                 }
             }
             Spacer()
