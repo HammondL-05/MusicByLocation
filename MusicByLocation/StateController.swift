@@ -7,14 +7,17 @@
 
 import Foundation
 
-class StateController: ObservableObject {
+class StateController: ObservableObject, Identifiable {
+    let locationHandler: LocationHandler = LocationHandler()
+    let iTunesAdaptor = ITunesAdaptor()
+    @Published var artistNames: [String] = []
+    @Published var artistDict: [String: String] = [:]
     var lastKnownLocation: String = "" {
         didSet {
-            getArtists(search: lastKnownLocation)
+            iTunesAdaptor.getArtists(search: lastKnownLocation, completion: updateArtistsViaLocation)
         }
     }
-    @Published var artistNames: String = ""
-    let locationHandler: LocationHandler = LocationHandler()
+    
     
     func findMusic() {
         locationHandler.requestLocation()
@@ -25,37 +28,28 @@ class StateController: ObservableObject {
         locationHandler.requestAuthorisation()
     }
     
-    func getArtists(search: String) {
-        guard let url = URL(string: "https://itunes.apple.com/search?term=\(search)&entity=musicArtist")
-        else {
-            print("Invalid URL")
-            return
+    func updateArtistsViaLocation(artists: [Artist]?) {
+        let simpleNames = artists?.map {
+            return $0.name + ", " + $0.genre ?? ""
         }
         
-        let request = URLRequest(url: url)
         
-        URLSession.shared.dataTask(with: request) { (data, response, error) in
-            if let data = data {
-                if let response = self.parseJSON(json: data) {
-                    let names = response.results.map {
-                        return $0.name
-                    }
-                    DispatchQueue.main.async {
-                        self.artistNames = names.joined(separator: ", ")
-                    }
+        let names: [(String, String)] = artists?.map { return ($0.genre ?? "", $0.name)} as? [(String, String)]
+        for artist in names {
+            if self.artistDict.keys.isEmpty == true {
+                self.artistDict[artist.0] = artist.1
+            }
+            for key in self.artistDict.keys {
+                if artist.0 == key {
+                    self.artistDict[key]?.append(artist.1)
+                }
+                else {
+                    self.artistDict[artist.0] = artist.1
                 }
             }
-        }.resume()
-    }
-    
-    func parseJSON(json: Data) -> ArtistResponse? {
-        let decoder = JSONDecoder()
-        
-        if let artistResponse = try? decoder.decode(ArtistResponse.self, from: json) {
-            return artistResponse
-        } else {
-            print("Error Decoding JSON")
-            return nil
         }
     }
 }
+
+
+

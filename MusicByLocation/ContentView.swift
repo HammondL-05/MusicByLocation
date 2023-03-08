@@ -8,12 +8,15 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var state = StateController()
+    @ObservedObject private var state = StateController()
     
     var body: some View {
         VStack {
-            Text("\(state.artistNames)")
-                .padding()
+            List {
+                ForEach(state.artistDict, id: \.self) { key, value in
+                    
+                }
+            }
             Spacer()
             Button("Find Music", action: {
                 state.findMusic()
