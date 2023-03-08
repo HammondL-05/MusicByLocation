@@ -10,8 +10,8 @@ import Foundation
 class StateController: ObservableObject, Identifiable {
     let locationHandler: LocationHandler = LocationHandler()
     let iTunesAdaptor = ITunesAdaptor()
-    @Published var artistNames: [String] = []
-    @Published var artistDict: [String: String] = [:]
+    @Published var artistNames: [StringTuple] = [StringTuple("", "")]
+    @Published var artistDict: [String: [String]] = [:]
     var lastKnownLocation: String = "" {
         didSet {
             iTunesAdaptor.getArtists(search: lastKnownLocation, completion: updateArtistsViaLocation)
@@ -29,25 +29,38 @@ class StateController: ObservableObject, Identifiable {
     }
     
     func updateArtistsViaLocation(artists: [Artist]?) {
-        let simpleNames = artists?.map { return $0.name + ", " + $0.genre ?? "No genre"}
-        DispatchQueue.main.async {
-            self.artistNames = simpleNames ?? ["No Artists"]
-        }
+        let names = artists?.map { return ($0.name + ", " + ($0.genre ?? "No genre"), $0.link ?? "No link") }
         
-//        let names: [(String, String)] = artists?.map { return ($0.genre ?? "", $0.name)} as? [(String, String)]
-//        for artist in names {
-//            if self.artistDict.keys.isEmpty == true {
-//                self.artistDict[artist.0] = artist.1
+        var namesTuples: [StringTuple] = []
+        
+        for name in names ?? [] {
+            namesTuples.append(StringTuple(name.0, name.1))
+        }
+
+        DispatchQueue.main.sync {
+            self.artistNames = namesTuples
+        }
+//        DispatchQueue.main.async {
+//            self.artistNames = simpleNames ?? ["No Artists"]
+//        }
+//        let names: [(String, String)] = artists?.map { return (($0.genre ?? "No Genre"), $0.name)} ?? [("No value","No value")]
+//        var artistDictionary: [String: [String]] = [:]
+//        for genre in names {
+//            if artistDictionary.keys.isEmpty == true {
+//                artistDictionary[genre.0] = [genre.1]
 //            }
-//            for key in self.artistDict.keys {
-//                if artist.0 == key {
-//                    self.artistDict[key]?.append(artist.1)
+//            for key in artistDictionary.keys {
+//                print(key)
+//                print(genre.0)
+//                if genre.0 == key {
+//                    artistDictionary[key]?.append(genre.1)
 //                }
 //                else {
-//                    self.artistDict[artist.0] = artist.1
+//                    artistDictionary[genre.0] = [genre.1]
 //                }
 //            }
 //        }
+//        DispatchQueue.main.sync {self.artistDict = artistDictionary}
     }
 }
 

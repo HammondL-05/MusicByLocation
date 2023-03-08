@@ -11,7 +11,7 @@ class ITunesAdaptor {
     
     func getArtists(search: String, completion: @escaping ([Artist]?) -> Void) {
         let baseURL = "https://itunes.apple.com"
-        let path = "/search?term=\(search)&entity=musicArtist&limit=10".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        let path = "/search?term=\(search)&entity=musicArtist".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         guard let url = URL(string: baseURL + path)
         else {
             print("Invalid URL")
@@ -23,6 +23,7 @@ class ITunesAdaptor {
         
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let data = data {
+                //print(String(decoding: data, as: UTF8.self))
                 if let response = self.parseJSON(json: data) {
                     completion(response.results)
                 } else {
