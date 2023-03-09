@@ -10,37 +10,41 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject private var state = StateController()
     @State var findMusicPressed = false
+    @State var countdownSeconds = 3
+    @State var timer: Timer?
     
     var body: some View {
         VStack {
+            let artistDictionary: [String: [StringTuple]] = state.artistDictionary
             List {
-//                ForEach(Array(state.artistDict.keys).sorted(by: <), id: \.self) { key in
-//                    Section(header: Text(key)) {
-//                        ForEach((state.artistDict[key] ?? [""])) { value in
-//                            Button(value, action: {
-//
-//                            })
-//                        }
-//                    }
-//                }
-                ForEach(Array(state.artistNames), id: \.self) { artist in
-                    if artist.first != "" {
-                        Link(artist.first, destination: URL(string: artist.second) ?? URL(string: "https://itunes.apple.com/search?term=\(artist.first)&entity=musicArtist")!)
-                            .foregroundColor(.black)
-                            
-                    }
-                    else if findMusicPressed == true && artist.first == "" {
+                ForEach(artistDictionary.keys.sorted(), id: \.self) { genre in
+                    if countdownSeconds > 0 {
                         HStack {
                             Text("Loading...")
                             Spacer()
                             ProgressView().progressViewStyle(CircularProgressViewStyle())
                         }
+                    } else {
+                        Section(header: Text(genre)) {
+                            ForEach(artistDictionary[genre]!) { artist in
+                                Link(artist.first, destination: URL(string: artist.second) ?? URL(string: "https://itunes.apple.com/search?term=\(artist.first)&entity=musicArtist")!).foregroundColor(.black)
+                            }
+                        }
                     }
-                    else {
-                        Text("Press Find Music to start your search...")
+                }
+                .onAppear {
+                    Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+                        if countdownSeconds > 0 {
+                            countdownSeconds -= 1
+                        } else {
+                            timer.invalidate()
+                        }
                     }
                 }
             }
+            .navigationBarTitle("Artists")
+            
+            
             Spacer()
             Button("Find Music", action: {
                 state.findMusic()

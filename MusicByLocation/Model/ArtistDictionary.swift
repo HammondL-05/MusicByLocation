@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct artistDictionary<Key: Hashable>: Hashable, Equatable, Identifiable {
+struct ArtistDictionary<Key: Hashable>: Hashable, Equatable {
     private var dictionary: [Key: [StringTuple]] = [:]
-    
+
     mutating func appendKey(_ key: Key, value: StringTuple) {
         if let existingValues = dictionary[key] {
             dictionary[key] = existingValues + [value]
@@ -32,10 +32,9 @@ struct artistDictionary<Key: Hashable>: Hashable, Equatable, Identifiable {
             }
         }
     }
+
     
-    var id: UUID
-    
-    static func == (lhs: artistDictionary<Key>, rhs: artistDictionary<Key>) -> Bool {
+    static func == (lhs: ArtistDictionary<Key>, rhs: ArtistDictionary<Key>) -> Bool {
         return lhs.dictionary == rhs.dictionary
     }
     

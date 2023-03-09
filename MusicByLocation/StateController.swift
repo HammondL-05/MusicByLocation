@@ -11,12 +11,12 @@ class StateController: ObservableObject, Identifiable {
     let locationHandler: LocationHandler = LocationHandler()
     let iTunesAdaptor = ITunesAdaptor()
     @Published var artistNames: [StringTuple] = [StringTuple("", "")]
-    @Published var artistDict: [String: [String]] = [:]
     var lastKnownLocation: String = "" {
         didSet {
             iTunesAdaptor.getArtists(search: lastKnownLocation, completion: updateArtistsViaLocation)
         }
     }
+    @Published var artistDictionary = [String: [StringTuple]]()
     
     
     func findMusic() {
@@ -29,38 +29,33 @@ class StateController: ObservableObject, Identifiable {
     }
     
     func updateArtistsViaLocation(artists: [Artist]?) {
-        let names = artists?.map { return ($0.name + ", " + ($0.genre ?? "No genre"), $0.link ?? "No link") }
+//        let names = artists?.map { return ($0.name + ", " + ($0.genre ?? "No genre"), $0.link ?? "No link") }
+//
+//        var namesTuples: [StringTuple] = []
+//
+//        for name in names ?? [] {
+//            namesTuples.append(StringTuple(name.0, name.1))
+//        }
+//
+//        DispatchQueue.main.sync {
+//            self.artistNames = namesTuples
+//        }
         
-        var namesTuples: [StringTuple] = []
-        
-        for name in names ?? [] {
-            namesTuples.append(StringTuple(name.0, name.1))
-        }
 
-        DispatchQueue.main.sync {
-            self.artistNames = namesTuples
+        if let names = artists?.map({ return (($0.genre ?? "No genre"), $0.name, $0.link ?? "No link") }) {
+            for artist in names {
+                let genre = artist.0
+                let tuple = StringTuple(artist.1, artist.2)
+                
+                DispatchQueue.main.sync {
+                    if let existingValues = self.artistDictionary[genre] {
+                        self.artistDictionary[genre] = existingValues + [tuple]
+                    } else {
+                        self.artistDictionary[genre] = [tuple]
+                    }
+                }
+            }
         }
-//        DispatchQueue.main.async {
-//            self.artistNames = simpleNames ?? ["No Artists"]
-//        }
-//        let names: [(String, String)] = artists?.map { return (($0.genre ?? "No Genre"), $0.name)} ?? [("No value","No value")]
-//        var artistDictionary: [String: [String]] = [:]
-//        for genre in names {
-//            if artistDictionary.keys.isEmpty == true {
-//                artistDictionary[genre.0] = [genre.1]
-//            }
-//            for key in artistDictionary.keys {
-//                print(key)
-//                print(genre.0)
-//                if genre.0 == key {
-//                    artistDictionary[key]?.append(genre.1)
-//                }
-//                else {
-//                    artistDictionary[genre.0] = [genre.1]
-//                }
-//            }
-//        }
-//        DispatchQueue.main.sync {self.artistDict = artistDictionary}
     }
 }
 

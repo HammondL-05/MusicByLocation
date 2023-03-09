@@ -7,7 +7,8 @@
 
 import Foundation
 
-struct StringTuple: Hashable, Equatable {
+struct StringTuple: Hashable, Equatable, Identifiable {
+    let id = UUID()
     let value: (String, String)
     var first: String
     var second: String
@@ -35,4 +36,6 @@ struct StringTuple: Hashable, Equatable {
         hasher.combine(self.second)
     }
 }
+
+
 
