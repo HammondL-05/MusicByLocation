@@ -11,6 +11,7 @@ class StateController: ObservableObject, Identifiable {
     let locationHandler: LocationHandler = LocationHandler()
     let iTunesAdaptor = ITunesAdaptor()
     @Published var artistNames: [StringTuple] = [StringTuple("", "")]
+    @Published var isLoading = false
     var lastKnownLocation: String = "" {
         didSet {
             iTunesAdaptor.getArtists(search: lastKnownLocation, completion: updateArtistsViaLocation)
@@ -21,6 +22,7 @@ class StateController: ObservableObject, Identifiable {
     
     func findMusic() {
         locationHandler.requestLocation()
+        
     }
     
     func requestAccessToLocationData() {
@@ -47,12 +49,13 @@ class StateController: ObservableObject, Identifiable {
                 let genre = artist.0
                 let tuple = StringTuple(artist.1, artist.2)
                 
-                DispatchQueue.main.sync {
+                DispatchQueue.main.async {
                     if let existingValues = self.artistDictionary[genre] {
                         self.artistDictionary[genre] = existingValues + [tuple]
                     } else {
                         self.artistDictionary[genre] = [tuple]
                     }
+                    self.isLoading = false
                 }
             }
         }
