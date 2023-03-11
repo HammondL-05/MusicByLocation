@@ -31,19 +31,6 @@ class StateController: ObservableObject, Identifiable {
     }
     
     func updateArtistsViaLocation(artists: [Artist]?) {
-//        let names = artists?.map { return ($0.name + ", " + ($0.genre ?? "No genre"), $0.link ?? "No link") }
-//
-//        var namesTuples: [StringTuple] = []
-//
-//        for name in names ?? [] {
-//            namesTuples.append(StringTuple(name.0, name.1))
-//        }
-//
-//        DispatchQueue.main.sync {
-//            self.artistNames = namesTuples
-//        }
-        
-
         if let names = artists?.map({ return (($0.genre ?? "No genre"), $0.name, $0.link ?? "No link") }) {
             for artist in names {
                 let genre = artist.0
