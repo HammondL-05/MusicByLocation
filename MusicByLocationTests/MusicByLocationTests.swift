@@ -10,8 +10,28 @@ import XCTest
 
 class MusicByLocationTests: XCTestCase {
 
-    func testStringDictionaryMethodsWorkAsExpected() {
-        
+    func testStringTupleMethodsWorkAsExpected() {
+        //arrange
+        let stringTuple = StringTuple("one","two")
+        let expectedFirst = "one"
+        let expectedSecond = "two"
+        //act
+        let actualFirst = stringTuple.getFirst()
+        let actualSecond = stringTuple.getSecond()
+        //assert
+        XCTAssertEqual(actualFirst,expectedFirst)
+        XCTAssertEqual(actualSecond,expectedSecond)
     }
-
+    
+    func testJSONDecodes() {
+        //arrange
+        let iTunesAdaptor = ITunesAdaptor()
+        let state = StateController()
+        //act
+        let actual: () = iTunesAdaptor.getArtists(search: state.lastKnownLocation, completion: state.updateArtistsViaLocation)
+        //assert
+        XCTAssertNotNil(actual)
+    }
 }
+
+

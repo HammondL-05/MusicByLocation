@@ -9,11 +9,10 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject private var state = StateController()
-    @State var findMusicPressed = false
     
     var body: some View {
         VStack {
-            if !findMusicPressed {
+            if !state.buttonPressed {
                 VStack {
                     Section {
                         Image("MusicIcon")
@@ -46,7 +45,7 @@ struct ContentView: View {
             Spacer()
             Button("Find Music", action: {
                 state.findMusic()
-                findMusicPressed = true
+                state.buttonPressed = true
             })
         }
         .onAppear(perform: {

@@ -10,7 +10,7 @@ import Foundation
 class StateController: ObservableObject, Identifiable {
     let locationHandler: LocationHandler = LocationHandler()
     let iTunesAdaptor = ITunesAdaptor()
-    @Published var artistNames: [StringTuple] = [StringTuple("", "")]
+    @Published var buttonPressed = false
     @Published var isLoading = false
     var lastKnownLocation: String = "" {
         didSet {
